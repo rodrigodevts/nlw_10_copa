@@ -1,28 +1,38 @@
+import React from 'react';
 import { NativeBaseProvider, StatusBar } from 'native-base';
 
 import { Loading } from './src/components/Loading';
-import { SigIn } from './src/screens/SigIn';
+import { SignIn } from './src/screens/SignIn';
 
 import { THEME } from './src/styles/theme';
 
-import { Roboto_400Regular, Roboto_500Medium, Roboto_700Bold, useFonts } from '@expo-google-fonts/roboto';
+import {
+  Roboto_400Regular,
+  Roboto_500Medium,
+  Roboto_700Bold,
+  useFonts,
+} from '@expo-google-fonts/roboto';
+import { AuthContextProvider } from './src/contexts/AuthContext';
+import { New } from './src/screens/New';
+import { Pools } from './src/screens/Pools';
 
 export default function App() {
-  const [ fontsLoaded ] = useFonts({
+  const [fontsLoaded] = useFonts({
     Roboto_400Regular,
     Roboto_500Medium,
-    Roboto_700Bold
+    Roboto_700Bold,
   });
-
 
   return (
     <NativeBaseProvider theme={THEME}>
-      <StatusBar
-        barStyle='light-content'
-        backgroundColor='transparent'
-        translucent
-      />
-      {!fontsLoaded ? <Loading /> : <SigIn />}
+      <AuthContextProvider>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
+        {!fontsLoaded ? <Loading /> : <Pools />}
+      </AuthContextProvider>
     </NativeBaseProvider>
   );
 }
