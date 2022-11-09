@@ -7,7 +7,7 @@ async function main() {
     data: {
       name: 'John Snow',
       email: 'dragon@gmail.com',
-      avatarUrl: 'https://github.com/rodrigodevts.png'
+      avatarUrl: 'https://github.com/rodrigodevts.png',
     }
   });
 
@@ -26,7 +26,7 @@ async function main() {
 
   await prisma.game.create({
     data: {
-      date: '2022-11-06T21:46:02.874Z',
+      date: '2022-11-12T21:46:02.874Z',
       firstTeamCountryCode: 'DE',
       secondTeamCountryCode: 'BR',
     }
@@ -34,7 +34,7 @@ async function main() {
 
   await prisma.game.create({
     data: {
-      date: '2022-11-05T21:46:02.874Z',
+      date: '2022-11-11T21:46:02.874Z',
       firstTeamCountryCode: 'BR',
       secondTeamCountryCode: 'AR',
 

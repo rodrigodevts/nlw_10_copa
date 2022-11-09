@@ -3,7 +3,8 @@ import { createContext, ReactNode } from 'react';
 
 import * as Google from 'expo-auth-session/providers/google';
 import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
+
+import { api } from '../services/api';
 
 interface UserProps {
   name: string;
@@ -16,18 +17,34 @@ export interface AuthContextDataProps {
   signIn: () => Promise<void>;
 }
 
-export const AuthContext = createContext({} as AuthContextDataProps);
-
 interface AuthContextProviderProps {
   children: ReactNode;
 }
 
-export function AuthContextProvider({ children }: AuthContextProviderProps) {
+interface RequestPostUsersProps {
+  data: {
+    token: string;
+  };
+}
+
+interface RequestGetUserInfoProps {
+  data: {
+    user: UserProps;
+  };
+}
+
+export const AuthContext = createContext({} as AuthContextDataProps);
+
+export function AuthContextProvider({
+  children,
+}: AuthContextProviderProps) {
   const [user, setUser] = useState<UserProps>({} as UserProps);
   const [isUserLoading, setIsUserLoading] = useState(false);
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: '867437635628-2143ppf0dvhcv51nakagv4m9c786cv2s.apps.googleusercontent.com',
+    clientId:
+      '867437635628-2143ppf0dvhcv51nakagv4m9c786cv2s.apps.googleusercontent.com',
     redirectUri: AuthSession.makeRedirectUri({ useProxy: true }),
     scopes: ['profile', 'email'],
   });
@@ -44,13 +61,44 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
-  function signInWithGoogle(access_token: string) {
-    console.log('TOKEN: ' + access_token);
+  async function signInWithGoogle(access_token: string) {
+    try {
+      setIsUserLoading(true);
+
+      const tokenResponse: RequestPostUsersProps = await api.post(
+        '/users',
+        {
+          access_token,
+        },
+      );
+
+      if (tokenResponse.data.token) {
+        api.defaults.headers.common[
+          'Authorization'
+        ] = `Bearer ${tokenResponse.data.token}`;
+
+        const userInfoResponse: RequestGetUserInfoProps =
+          await api.get('/me');
+
+        setUser(userInfoResponse.data.user);
+      }
+    } catch (err) {
+      console.log(err);
+      throw err;
+    } finally {
+      setIsUserLoading(false);
+    }
   }
 
   useEffect(() => {
-    if (response?.type === 'success' && response.authentication?.accessToken) {
-      signInWithGoogle(response.authentication.accessToken);
+    if (
+      response?.type === 'success' &&
+      response.authentication?.accessToken
+    ) {
+      signInWithGoogle(response.authentication.accessToken).then(
+        () => {},
+        () => {},
+      );
     }
   }, [response]);
 
@@ -60,7 +108,8 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
         user,
         isUserLoading,
         signIn,
-      }}>
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

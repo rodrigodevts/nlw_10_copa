@@ -13,8 +13,7 @@ import {
   useFonts,
 } from '@expo-google-fonts/roboto';
 import { AuthContextProvider } from './src/contexts/AuthContext';
-import { New } from './src/screens/New';
-import { Pools } from './src/screens/Pools';
+import { Routes } from './src/routes';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -31,7 +30,7 @@ export default function App() {
           backgroundColor="transparent"
           translucent
         />
-        {!fontsLoaded ? <Loading /> : <Pools />}
+        {!fontsLoaded ? <Loading /> : <Routes />}
       </AuthContextProvider>
     </NativeBaseProvider>
   );
